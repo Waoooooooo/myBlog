@@ -8,7 +8,7 @@ const app = express()
 const port = 10086
 
 //日志
-app.all('/*', (req, res, next) => {
+app.all('/api/*', (req, res, next) => {
   console.log(req.url)
   console.log("请求体:",req.body)
   next()
@@ -19,33 +19,34 @@ app.use(express.static('public'))
 
 //--------博客信息查询-----------------
 //通过id查询一篇博客  返回undefined 或者 一个对象
-app.get('/blog/:id', (req, res, next) => {
+app.get('/api/blog/:id', (req, res, next) => {
   const blog = dbApi.getBlogById(req.params.id)
   req.data = blog
   next()
 })
+
 //获取所有博客
-app.get('/blogs', (req, res, next) => {
+app.get('/api/blogs', (req, res, next) => {
   req.data = dbApi.getBlogs()
   next()
 })
 
 //增加一篇博客(传入一个博客对象)
-app.post("/addBlog", (req, res, next) => {
+app.post("/api/addBlog", (req, res, next) => {
   const blog = req.body
   req.data = dbApi.addBlog(blog)
   next()
 })
 
 //根据博客id删除博客
-app.delete("/deleteBlog/:id", (req, res, next) => {
+app.delete("/api/deleteBlog/:id", (req, res, next) => {
   req.data = dbApi.deleteBlog(req.params.id)
   next()
 })
 
 
 //修改博客
-app.patch("/patchBlog",(req,res,next)=>{
+app.patch("/api/patchBlog",(req,res,next)=>{
   req.data = dbApi.patchBlog(req.body)
   next()
 })
@@ -56,32 +57,32 @@ app.patch("/patchBlog",(req,res,next)=>{
 
 //------标签相关------------------
 //获取所有的标签
-app.get('/tags', (req, res, next) => {
+app.get('/api/tags', (req, res, next) => {
   req.data = dbApi.getTags()
   next()
 })
 -
 //添加标签
-app.get('/tags', (req, res, next) => {
+app.get('/api/tags', (req, res, next) => {
   req.data = dbApi.addTag(req.body)
   next()
 })
 
 //用户相关
 //注册用户
-app.post("/register", (req, res, next) => {
+app.post("/api/register", (req, res, next) => {
   req.data = dbApi.register(req.body)
   next()
 })
 
 //登录
-app.post("/login",(req, res, next) => {
+app.post("/api/login",(req, res, next) => {
   req.data = dbApi.login(req.body)
   next()
 })
 
 //最后处理的中间件
-app.get('/*', (req, res, next) => {
+app.get('/api/*', (req, res, next) => {
   let result = {
     success: true,
     code: 200,
