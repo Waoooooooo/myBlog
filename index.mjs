@@ -7,13 +7,15 @@ const app = express()
 //创建服务器实例
 const port = 10086
 
+//自动将带有json请求头的数据转为json格式
+app.use(express.json())
+
 //日志
 app.all('/api/*', (req, res, next) => {
   console.log(req.url)
   console.log("请求体:",req.body)
   next()
 })
-
 //静态文件服务
 app.use(express.static('public'))
 
@@ -63,12 +65,12 @@ app.get('/api/tags', (req, res, next) => {
 })
 -
 //添加标签
-app.get('/api/tags', (req, res, next) => {
+app.put('/api/tags', (req, res, next) => {
   req.data = dbApi.addTag(req.body)
   next()
 })
 
-//用户相关
+//--用户相关---------------------------------------------
 //注册用户
 app.post("/api/register", (req, res, next) => {
   req.data = dbApi.register(req.body)
@@ -77,30 +79,21 @@ app.post("/api/register", (req, res, next) => {
 
 //登录
 app.post("/api/login",(req, res, next) => {
+  console.log("登录的信息为",req.body)
   req.data = dbApi.login(req.body)
+  console.log("发送的数据为",req.data)
   next()
 })
 
 //最后处理的中间件
-app.get('/api/*', (req, res, next) => {
-  let result = {
-    success: true,
-    code: 200,
-    message: "ok",
-    data: {}
-  };
-  if (req.data === false) {
-    result.code = 400
-    result.success = false
-    result.message = "请求有误,未成功"
-  } else if (req.data) {
-    result.data = req.data
+app.all('/api/*', (req, res, next) => {
+  console.log("最后处理环节")
+   if (req.data) {
+    res.send(req.data)
   } else {
-    result.success = false
-    result.code = 404
-    result.message = "not found"
+    res.status(404).send({code:-1,msg:"not found"})
   }
-  res.send(result)
+
 })
 
 app.listen(port, () => {
